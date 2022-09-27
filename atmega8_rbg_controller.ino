@@ -66,7 +66,7 @@ void setup() {
   rgb[0] =    eeprom_read_byte((uint8_t*)2);
   rgb[1] =    eeprom_read_byte((uint8_t*)3);
   rgb[2] =    eeprom_read_byte((uint8_t*)4);
-  brightness= eeprom_read_byte((uint8_t*)5);
+  brightness = eeprom_read_byte((uint8_t*)5);
   speed =     eeprom_read_byte((uint8_t*)6);
 
   pinMode(RED, OUTPUT);
@@ -94,7 +94,7 @@ void loop() {
     ir_available = 0;
   }
 
-  
+
 
   if (fade_mode) {
     rgb_fade();
@@ -103,7 +103,7 @@ void loop() {
     rgb_fire();
   }
 
-  
+
 
   if (enabled) {
     if (brightness < save_brightness) {
@@ -111,18 +111,16 @@ void loop() {
         smooth_brightness_timer = millis();
         brightness++;
       }
-      rgb_write();
     }
     else {
-      if (!save_brightness_flag) {
-        save_brightness_flag = 1;
-      }
-      rgb_write();
+      save_brightness_flag = 1;
+      save_brightness = 0;
     }
+    rgb_write();
   }
 
 
-  
+
   if (!enabled) {
     if (save_brightness_flag) {
       save_brightness = brightness;
@@ -238,14 +236,16 @@ void system_on() {
 }
 
 void system_off() {
-  enabled = 0;
-  eeprom_update_byte((uint8_t*)0, fade_mode);
-  eeprom_update_byte((uint8_t*)1, fire_mode);
-  eeprom_update_byte((uint8_t*)2, rgb[0]);
-  eeprom_update_byte((uint8_t*)3, rgb[1]);
-  eeprom_update_byte((uint8_t*)4, rgb[2]);
-  eeprom_update_byte((uint8_t*)5, brightness);
-  eeprom_update_byte((uint8_t*)6, speed);
+  if (enabled) {
+    enabled = 0;
+    eeprom_update_byte((uint8_t*)0, fade_mode);
+    eeprom_update_byte((uint8_t*)1, fire_mode);
+    eeprom_update_byte((uint8_t*)2, rgb[0]);
+    eeprom_update_byte((uint8_t*)3, rgb[1]);
+    eeprom_update_byte((uint8_t*)4, rgb[2]);
+    eeprom_update_byte((uint8_t*)5, brightness);
+    eeprom_update_byte((uint8_t*)6, speed);
+  }
   if (millis() - on_off_timer > 500) {
     on_off_speed = speed;
   }
